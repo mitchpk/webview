@@ -75,6 +75,12 @@ WEBVIEW_API void webview_set_title(webview_t w, const char *title);
 WEBVIEW_API void webview_set_size(webview_t w, int width, int height,
                                   int hints);
 
+// Shows the native window.
+WEBVIEW_API void webview_show(webview_t w);
+
+// Hides the native window.
+WEBVIEW_API void webview_hide(webview_t w);
+
 // Navigates webview to the given URL. URL may be a data URI, i.e.
 // "data:text/text,<html>...</html>". It is often ok not to url-encode it
 // properly, webview will re-encode it for you.
@@ -534,6 +540,14 @@ public:
     }
   }
 
+  void show() {
+    gtk_widget_show_all(m_window);
+  }
+
+  void hide() {
+    gtk_widget_hide(m_window);
+  }
+
   void navigate(const std::string url) {
     webkit_web_view_load_uri(WEBKIT_WEB_VIEW(m_webview), url.c_str());
   }
@@ -758,6 +772,14 @@ public:
           CGRectMake(0, 0, width, height), 1, 0);
     }
     ((void (*)(id, SEL))objc_msgSend)(m_window, "center"_sel);
+  }
+  void show() {
+    ((void (*)(id, SEL, id))objc_msgSend)(m_window, "makeKeyAndOrderFront:"_sel,
+                                          nullptr);
+  }
+  void hide() {
+    ((void (*)(id, SEL, id))objc_msgSend)(m_window, "orderOut:"_sel,
+                                          nullptr);
   }
   void navigate(const std::string url) {
     auto nsurl = ((id(*)(id, SEL, id))objc_msgSend)(
@@ -1194,6 +1216,14 @@ public:
     }
   }
 
+  void show() {
+    ShowWindow(m_window, SW_SHOW);
+  }
+
+  void hide() {
+    ShowWindow(m_window, SW_HIDE);
+  }
+
   void navigate(const std::string url) { m_browser->navigate(url); }
   void eval(const std::string js) { m_browser->eval(js); }
   void init(const std::string js) { m_browser->init(js); }
@@ -1333,6 +1363,14 @@ WEBVIEW_API void webview_set_title(webview_t w, const char *title) {
 WEBVIEW_API void webview_set_size(webview_t w, int width, int height,
                                   int hints) {
   static_cast<webview::webview *>(w)->set_size(width, height, hints);
+}
+
+WEBVIEW_API void webview_show(webview_t w) {
+  static_cast<webview::webview *>(w)->show();
+}
+
+WEBVIEW_API void webview_hide(webview_t w) {
+  static_cast<webview::webview *>(w)->hide();
 }
 
 WEBVIEW_API void webview_navigate(webview_t w, const char *url) {
